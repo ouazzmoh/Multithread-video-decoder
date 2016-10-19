@@ -41,3 +41,19 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${ALLSTRIP_PKG_CFLAGS} -Wall -We
 add_executable(ensivideo src/ensivideo.c src/ensitheora.c src/ensivorbis.c src/oggstream.c src/stream_common.c src/synchro.c)
 
 target_link_libraries(ensivideo pthread ${ALLSTRIP_PKG_LDFLAGS})
+
+##
+# Construction de l'archive
+##
+string(REPLACE ";" "-" LOGINS_SANS_POINTVIRGULE "${VARIANTE_LOGINS}")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH ${LOGINS_SANS_POINTVIRGULE})
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES
+  "~$"
+  "\\\\.o$"
+  "^${PROJECT_SOURCE_DIR}/build/"
+  "^${PROJECT_SOURCE_DIR}/.git/"
+)
+include(CPack)
