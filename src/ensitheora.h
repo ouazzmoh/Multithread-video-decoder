@@ -1,13 +1,14 @@
 #ifndef THEORA_H
 #define THEORA_H
 
+#include <ogg/ogg.h>
 #include <SDL2/SDL.h>
 #include "ensivideo.h"
 
 #define NBTEX 10
 
 struct TextureDate {
-    SDL_Texture *texture;
+    th_ycbcr_buffer buffer;
     double timems; // expiration date of the frame, in ms
 };
 
