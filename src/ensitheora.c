@@ -21,6 +21,7 @@ struct streamstate *theorastrstate=NULL;
 void *draw2SDL(void *arg) {
     int serial = (int) (long long int) arg;
     struct streamstate *s= NULL;
+    SDL_Texture* texture = NULL;
 
     attendreTailleFenetre();
     
@@ -42,15 +43,13 @@ void *draw2SDL(void *arg) {
 
 
     // la texture
-    for(int i=0; i < NBTEX; i++) {
-	texturedate[i].texture = SDL_CreateTexture(renderer,
-						   SDL_PIXELFORMAT_YV12,
-						   SDL_TEXTUREACCESS_STREAMING,
-						   windowsx,
-						   windowsy);
-	texturedate[i].timems = 0.0;
-	assert(texturedate[i].texture);
-    }
+    texture = SDL_CreateTexture(renderer,
+					   SDL_PIXELFORMAT_YV12,
+					   SDL_TEXTUREACCESS_STREAMING,
+					   windowsx,
+					   windowsy);
+
+    assert(texture);
 
     signalerFenetreEtTexturePrete();
 
@@ -74,11 +73,19 @@ void *draw2SDL(void *arg) {
 	}
 
 	debutConsommerTexture();
+
+	SDL_UpdateYUVTexture(texture, &rect,
+			       texturedate[tex_iaff].buffer[0].data,
+			       texturedate[tex_iaff].buffer[0].stride,
+			       texturedate[tex_iaff].buffer[1].data,
+			       texturedate[tex_iaff].buffer[1].stride,
+			       texturedate[tex_iaff].buffer[2].data,
+			       texturedate[tex_iaff].buffer[2].stride);
   
 	// Copy the texture with the renderer
 	SDL_SetRenderDrawColor(renderer, 0, 0, 128, 255);
 	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, texturedate[tex_iaff].texture, NULL, NULL);
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
 
 	double timemsfromstart = msFromStart();
@@ -92,6 +99,9 @@ void *draw2SDL(void *arg) {
 	if (delaims > 0.0)
 	    SDL_Delay(delaims);
     }
+
+    SDL_DestroyTexture(texture);
+
     return 0;   
 }
 
@@ -125,15 +135,11 @@ void theora2SDL(struct streamstate *s) {
 
     // 1 seul producteur/un seul conso => synchro sur le nb seulement
 
-    debutDeposerTexture();	
-	
-    res = SDL_UpdateYUVTexture(texturedate[tex_iwri].texture, & rect,
-			       buffer[0].data,
-			       buffer[0].stride,
-			       buffer[1].data,
-			       buffer[1].stride,
-			       buffer[2].data,
-			       buffer[2].stride);
+    debutDeposerTexture();
+
+    for(unsigned i = 0; i < 3; ++i)
+        texturedate[tex_iwri].buffer[i] = buffer[i];
+
     texturedate[tex_iwri].timems = framedate * 1000;
     assert(res == 0);
     tex_iwri = (tex_iwri + 1) % NBTEX;
