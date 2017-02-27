@@ -49,6 +49,17 @@ add_executable(ensivideo src/ensivideo.c src/ensitheora.c src/ensivorbis.c src/o
 target_link_libraries(ensivideo pthread ${ALLSTRIP_PKG_LDFLAGS})
 
 ##
+# Test utilisant Coccinelle
+##
+add_test(CommonPthreadError perl ${CMAKE_SOURCE_DIR}/tests/pthcocci.pl)
+
+##
+# Ajout d'une cible pour lancer les tests de manière verbeuse
+##
+add_custom_target(check ctest -V)
+
+
+##
 # Construction de l'archive
 ##
 string(REPLACE ";" "-" LOGINS_SANS_POINTVIRGULE "${VARIANTE_LOGINS}")
