@@ -12,7 +12,7 @@ The ogg/vorbis ogg/theora tutorials of
 https://bluishcoder.co.nz/tags/ogg/index.html
 are a very good material for understanding of the libraries.
 
-The synchronisation is quite different. This code uses 1 thread per stream and
+The synchronization is quite different. This code uses 1 thread per stream and
 common real-time deadline to set up synchronization. The sound playing
 is mostly managed by SDL2. The displayed frame is used with an
 additional thread and producer/consumer algorithms to synchronize
