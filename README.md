@@ -6,16 +6,16 @@ The idea came from the excellent ffmepg + SDL tutorial
 http://dranger.com/ffmpeg/ 
 
 This videoplayer does not use ffmpeg but libogg, libtheora and
-libvorbis. It use also SDL2 for the rendering and playing sound.
+libvorbis. It uses also SDL2 for the rendering and playing sound.
 
 The ogg/vorbis ogg/theora tutorials of
 https://bluishcoder.co.nz/tags/ogg/index.html
 are a very good material for understanding of the libraries.
 
-The synchronisation is quite different. This code use 1 thread per stream and
-common realtime deadline to set up synchronisation. The sound playing
-is mostly managed by SDL2. The frame displaying is used with an
-additionnal thread and producer/consummer algorithms to synchronize
+The synchronization is quite different. This code uses 1 thread per stream and
+common real-time deadline to set up synchronization. The sound playing
+is mostly managed by SDL2. The displayed frame is used with an
+additional thread and producer/consumer algorithms to synchronize
 stream reading and displaying.
 
 ## Compilation and unit testing ##
