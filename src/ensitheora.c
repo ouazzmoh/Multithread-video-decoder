@@ -156,14 +156,13 @@ void theora2SDL(struct streamstate *s) {
 	res =  th_decode_ycbcr_out(s->th_dec.ctx, videobuffer);
 
     // copy data in the current texturedate
-    for(int i=0; i < windowsy; i++) {
-	memmove( texturedate[tex_iwri].plane[0]+i*windowsx,
-		 videobuffer[0].data+i* videobuffer[0].stride, windowsx);
-	memmove( texturedate[tex_iwri].plane[1]+i*windowsx,
-		 videobuffer[1].data+i* videobuffer[1].stride, windowsx);
-	memmove( texturedate[tex_iwri].plane[2]+i*windowsx,
-		 videobuffer[2].data+i* videobuffer[2].stride, windowsx);
-    }    
+    for(int pl = 0; pl < 3; pl++) {
+	for(int i=0; i < videobuffer[pl].height; i++) {
+	    memmove( texturedate[tex_iwri].plane[pl]+i*windowsx,
+		     videobuffer[pl].data+i* videobuffer[pl].stride,
+		videobuffer[pl].width);
+	}
+    }
     texturedate[tex_iwri].timems = framedate * 1000;
     assert(res == 0);
     tex_iwri = (tex_iwri + 1) % NBTEX;
