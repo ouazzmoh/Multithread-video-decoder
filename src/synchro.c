@@ -2,7 +2,7 @@
 #include "ensitheora.h"
 
 
-bool fini;
+bool fini = false;
 
 /* les variables pour la synchro, ici */
 
