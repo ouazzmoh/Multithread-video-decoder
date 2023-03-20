@@ -1,14 +1,12 @@
 #ifndef SYNCHRO_H
 #define SYNCHRO_H
 
-#include <stdbool.h>
 #include "ensitheora.h"
+#include <stdbool.h>
 
 extern bool fini;
 
-
 /* Les extern des variables pour la synchro ici */
-
 
 /* Fonctions de synchro à implanter */
 
