@@ -1,5 +1,11 @@
 # Base for a multi-threaded video player #
 
+## C and C++ flavors ##
+
+Two versions are available in C and C++ directories
+1. C using POSIX Threads (Pthreads) or C threads version
+2. C++ using C++ threads version
+
 ## References ##
 
 The idea came from the excellent ffmepg + SDL tutorial
@@ -27,6 +33,8 @@ To compile:
 	cd build
 	cmake ..
 	make
+	make test   # C only
+	make check  # C only
 	```
 
 ## Goal ##

@@ -1,16 +1,16 @@
-#include "ensivorbis.h"
-#include "ensivideo.h"
-#include "stream_common.h"
+#include "ensivorbis.hpp"
+#include "ensivideo.hpp"
+#include "stream_common.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
-#include <assert.h>
-#include <time.h>
+#include <cassert>
+#include <chrono>
 
 SDL_AudioDeviceID audioid = 0;
 SDL_AudioSpec want = {};
 SDL_AudioSpec have = {};
 
-struct streamstate *vorbisstrstate = NULL;
+map<int, struct streamstate *> mapvorbisstrstate;
 
 void vorbis2SDL(struct streamstate *s) {
   static long long int nbsamplesbytes = 0;
@@ -25,7 +25,7 @@ void vorbis2SDL(struct streamstate *s) {
     audioid = SDL_OpenAudioDevice(NULL, false, &want, &have, 0);
     SDL_PauseAudioDevice(audioid, 0);
     // start point
-    clock_gettime(CLOCK_REALTIME, &datedebut);
+    datedebut = chrono::high_resolution_clock::now();
   }
   assert(audioid);
 
@@ -36,7 +36,7 @@ void vorbis2SDL(struct streamstate *s) {
   float **pcm = 0;
   int samples = 0;
   while ((samples = vorbis_synthesis_pcmout(&s->vo_dec.dsp, &pcm)) > 0) {
-    float *tmpbuff = malloc(samples * s->vo_dec.info.channels * sizeof(float));
+    float *tmpbuff = new float[samples * s->vo_dec.info.channels];
     for (int sa = 0, idx = 0; sa < samples; sa++)
       for (int c = 0; c < s->vo_dec.info.channels; c++, idx++)
         tmpbuff[idx] = pcm[c][sa];
@@ -44,7 +44,7 @@ void vorbis2SDL(struct streamstate *s) {
     SDL_QueueAudio(audioid, tmpbuff,
                    samples * s->vo_dec.info.channels * sizeof(float));
     nbsamplesbytes += samples * s->vo_dec.info.channels * sizeof(float);
-    free(tmpbuff);
+    delete[] tmpbuff;
     int res = vorbis_synthesis_read(&s->vo_dec.dsp, samples);
     assert(res == 0);
   }
@@ -54,8 +54,8 @@ void vorbis2SDL(struct streamstate *s) {
   /* attendre 1000 ms (1s) de moins */
 
   double fullaudiotimems = 1000 * nbsamplesbytes / sizeof(float) /
-                           (float){s->vo_dec.info.rate} /
-                           (float){s->vo_dec.info.channels};
+                           static_cast<float>(s->vo_dec.info.rate) /
+                           static_cast<float>(s->vo_dec.info.channels);
 
   double timemsfromstart = msFromStart();
 

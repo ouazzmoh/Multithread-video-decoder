@@ -28,6 +28,7 @@ void *theoraStreamReader(void *arg) {
     // printf("theora loop\n");// vérifier si le fichier ne serait pas fini
     if (feof(vf)) {
       fini = true;
+      fclose(vf);
       return 0;
     }
 

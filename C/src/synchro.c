@@ -1,7 +1,5 @@
-#include "synchro.h"
 #include "ensitheora.h"
-
-extern bool fini;
+#include "synchro.h"
 
 /* les variables pour la synchro, ici */
 

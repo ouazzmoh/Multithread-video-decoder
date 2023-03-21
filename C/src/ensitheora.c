@@ -52,9 +52,12 @@ void *draw2SDL(void *arg) {
 
   signalerFenetreEtTexturePrete();
 
+  // ADD Your code HERE
   /* Protéger l'accès à la hashmap */
 
   HASH_FIND_INT(theorastrstate, &serial, s);
+
+  // END of your modification HERE
 
   assert(s->strtype == TYPE_THEORA);
 
@@ -82,9 +85,7 @@ void *draw2SDL(void *arg) {
     SDL_RenderPresent(renderer);
 
     double timemsfromstart = msFromStart();
-
     int delaims = (int)(texturedate[tex_iaff].timems - timemsfromstart);
-
     tex_iaff = (tex_iaff + 1) % NBTEX;
 
     finConsommerTexture();

@@ -1,6 +1,6 @@
-#include "stream_common.h"
 #include "ensitheora.h"
 #include "ensivorbis.h"
+#include "stream_common.h"
 #include "synchro.h"
 #include <assert.h>
 #include <time.h>
@@ -42,6 +42,7 @@ void pageReader(FILE *vf, ogg_sync_state *pstate, ogg_page *ppage) {
 
 struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
                                    enum streamtype type) {
+  (void)pstate;
   // trouver le stream associé à la page ou le construire
   int serial = ogg_page_serialno(ppage);
   int bos = ogg_page_bos(ppage);
@@ -49,6 +50,7 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
   struct streamstate *s = NULL;
   if (bos) { // début de stream
     s = malloc(sizeof(struct streamstate));
+    assert(s != NULL);
     s->serial = serial;
     s->nbpacket = 0;
     s->nbpacketoutsync = 0;
@@ -61,6 +63,7 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
     vorbis_comment_init(&s->vo_dec.comment);
     assert(res == 0);
 
+    // ADD Your code HERE
     // proteger l'accès à la hashmap
 
     if (type == TYPE_THEORA)
@@ -76,6 +79,7 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
     else
       HASH_FIND_INT(vorbisstrstate, &serial, s);
 
+    // END of your code modification HERE
     assert(s != NULL);
   }
   assert(s != NULL);
@@ -131,9 +135,10 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
       s->headersRead = true;
 
       if (type == TYPE_THEORA) {
+	// BEGIN your modification HERE
         // lancement du thread gérant l'affichage (draw2SDL)
         // inserer votre code ici !!
-
+        // END of your modification
         assert(res == 0);
       }
     }

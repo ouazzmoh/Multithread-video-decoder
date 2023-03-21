@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 
-use v5.16;
+use v5.22;
 use strict;
 use warnings;
 
-my $commande= "spatch --sp-file ../tests/pthcheck.cocci --very-quiet ../src/synchro.c";
+my $commande= "spatch --sp-file pthcheck.cocci --very-quiet ../src/synchro.c";
 
 my $nb=0;
 

@@ -20,16 +20,20 @@ int main(int argc, char *argv[]) {
   atexit(SDL_Quit);
   assert(res == 0);
 
-  // start the two stream readers
+  // Your code HERE
+  // start the two stream readers (theoraStreamReader and vorbisStreamReader)
+  // each in a thread
+  
+  // wait for vorbis thread
 
-  // wait audio thread
-
-  // 1 seconde de garde pour le son,
+  // 1 seconde of sound in advance, thus wait 1 seconde
+  // before leaving
   sleep(1);
 
-  // tuer les deux threads videos si ils sont bloqués
+  // Wait for theora and theora2sdl threads
 
-  // attendre les 2 threads videos
+  // TODO
+  /* liberer des choses ? */
 
   exit(EXIT_SUCCESS);
 }
