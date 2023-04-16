@@ -7,10 +7,17 @@
 #include <fstream>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 
 using namespace std;
 
 bool fini = false;
+
+mutex theoraMtx; //Map to ensure that the competing threads access the map correctly
+condition_variable mapCond; //Do not access if a thread is already modifying it
+mutex vorbisMtx;
+
+
 
 
 chrono::time_point<chrono::high_resolution_clock> datedebut;
@@ -81,24 +88,32 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
     // proteger l'accès à chaque hashmap
 
     if (type == TYPE_THEORA) {
-
+      unique_lock<mutex> theoraLock(theoraMtx); //Lock for modification
+//      mapCond.wait(theoraLock);  //TODO: Are condition variables useful here ??
       maptheorastrstate[serial] = s;
-
+      theoraLock.unlock();
+//      mapCond.notify_one();
     } else {
+      unique_lock<mutex> vorbisLock(vorbisMtx);
       mapvorbisstrstate[serial] = s;
+      vorbisLock.unlock();
     }
 
   } else {
     // proteger l'accès à chaque hashmap
 
     if (type == TYPE_THEORA) {
+      unique_lock<mutex> theoraLock(theoraMtx);
       auto search = maptheorastrstate.find(serial);
       assert(search != maptheorastrstate.end());
       s = search->second;
+      theoraLock.unlock();
     } else {
+      unique_lock<mutex> vorbisLock(vorbisMtx);
       auto search = mapvorbisstrstate.find(serial);
       assert(search != mapvorbisstrstate.end());
       s = search->second;
+      vorbisLock.unlock();
     }
 
     // END of your modification of code HERE

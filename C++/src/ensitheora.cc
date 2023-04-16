@@ -56,11 +56,11 @@ void draw2SDL(int serial) {
 
   // ADD Your code HERE
   /* Protéger l'accès à la hashmap */
-
+  unique_lock<mutex> theoraLock(theoraMtx);
   auto search = maptheorastrstate.find(serial);
   assert(search != maptheorastrstate.end());
   s = search->second;
-
+  theoraLock.unlock();
   // END of your moficiation HERE
   assert(s->strtype == TYPE_THEORA);
 
