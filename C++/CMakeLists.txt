@@ -46,7 +46,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ALLSTRIP_PKG_CFLAGS} -Wall
 # les ajouter ici
 ##
 
-add_executable(ensivideo src/ensivideo.cc src/ensitheora.cc src/ensivorbis.cc src/oggstream.cc src/stream_common.cc src/synchro.cc src/vars.cc)
+add_executable(ensivideo src/ensivideo.cc src/ensitheora.cc src/ensivorbis.cc src/oggstream.cc src/stream_common.cc src/synchro.cc)
 
 target_link_libraries(ensivideo pthread ${ALLSTRIP_PKG_LDFLAGS})
 

@@ -7,11 +7,17 @@
 
 using namespace std;
 /* les variables pour la synchro, ici */
+//First 4 functions
 mutex mtxTaille;
 mutex mtxFenetre;
 condition_variable condTaille;
 condition_variable condFenetre;
 bool changedTaille = false;
+//Last 4 functions
+mutex mtxTexture;
+condition_variable condCons; condition_variable condProd;
+
+int idk = 1; //TODO: What number should be ? Most likely depends of tex_iaff and/or tex_iwri
 
 /* l'implantation des fonctions de synchro ici */
 //Decodeur
@@ -53,11 +59,29 @@ void attendreFenetreTexture() {
 
 
 
-void debutConsommerTexture() {}
+void debutConsommerTexture() {
+    unique_lock<mutex> lockTexture(mtxTexture);
+    while(idk  == 0){
+        condCons.wait(lockTexture);
+    }
+    lockTexture.unlock();
+}
 
-void finConsommerTexture() {}
+void finConsommerTexture() {
+    condProd.notify_one();
+}
 
-void debutDeposerTexture() {}
 
-void finDeposerTexture() {}
+
+void debutDeposerTexture() {
+    unique_lock<mutex> lockTexture(mtxTexture);
+    while(idk  == NBTEX){
+        condProd.wait(lockTexture);
+    }
+    lockTexture.unlock();
+}
+
+void finDeposerTexture() {
+    condCons.notify_one();
+}
 
