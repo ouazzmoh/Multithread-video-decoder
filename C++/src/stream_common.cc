@@ -5,6 +5,8 @@
 #include <cassert>
 #include <chrono>
 #include <fstream>
+#include <thread>
+#include <mutex>
 
 using namespace std;
 
@@ -12,6 +14,12 @@ bool fini = false;
 
 
 chrono::time_point<chrono::high_resolution_clock> datedebut;
+
+unique_ptr<thread> displaythread;
+
+//mtx_t mutexTheora;
+
+
 
 int msFromStart() {
   // struct timespec now;
@@ -73,7 +81,9 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
     // proteger l'accès à chaque hashmap
 
     if (type == TYPE_THEORA) {
+
       maptheorastrstate[serial] = s;
+
     } else {
       mapvorbisstrstate[serial] = s;
     }
@@ -148,6 +158,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 
       if (type == TYPE_THEORA) {
 	// BEGIN your modification HERE
+        displaythread = make_unique<thread>(draw2SDL, s->serial);
         // lancement du thread gérant l'affichage (draw2SDL)
         // inserer votre code ici !!
         // END of your modification

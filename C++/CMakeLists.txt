@@ -14,7 +14,7 @@ set(CMAKE_BUILD_TYPE Debug)
 #########
 # Vous devez editer les lignes suivantes pour y mettre vos logins
 #########
-set(LOGINS login1 login2 login3)
+set(LOGINS ouazzmoh cherkaoa)
 
 # Vérification du renseignement des login
 list(SORT LOGINS)
@@ -38,7 +38,7 @@ message(STATUS "ldflags: ${ALLSTRIP_PKG_LDFLAGS}")
 # Passer le compilateur CXX au standard C++-20 et ajouter les CFLAGS pour la sdl
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ALLSTRIP_PKG_CFLAGS} -Wall -Wextra -Werror -fanalyzer")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ALLSTRIP_PKG_CFLAGS} -Wall -Wextra -Werror")
 
 
 ##
@@ -46,7 +46,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ALLSTRIP_PKG_CFLAGS} -Wall
 # les ajouter ici
 ##
 
-add_executable(ensivideo src/ensivideo.cc src/ensitheora.cc src/ensivorbis.cc src/oggstream.cc src/stream_common.cc src/synchro.cc)
+add_executable(ensivideo src/ensivideo.cc src/ensitheora.cc src/ensivorbis.cc src/oggstream.cc src/stream_common.cc src/synchro.cc src/vars.cc)
 
 target_link_libraries(ensivideo pthread ${ALLSTRIP_PKG_LDFLAGS})
 

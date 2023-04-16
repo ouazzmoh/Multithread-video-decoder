@@ -9,6 +9,8 @@ using namespace std;
 extern bool fini;
 extern chrono::time_point<chrono::high_resolution_clock> datedebut;
 
+extern unique_ptr<thread> displaythread;
+
 int msFromStart();
 void pageReader(ifstream &vf, ogg_sync_state *pstate, ogg_page *ppage);
 struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
