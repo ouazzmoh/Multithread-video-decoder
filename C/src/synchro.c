@@ -1,21 +1,74 @@
 #include "ensitheora.h"
 #include "synchro.h"
+#include "pthread.h"
 
 /* les variables pour la synchro, ici */
+pthread_mutex_t mtxTaille , mtxFenetre, mtxTexture;
+pthread_cond_t condTaille, condFenetre, condCons, condProd;
+bool changedTaille = false;
+
+int emptyCases = NBTEX;
 
 /* l'implantation des fonctions de synchro ici */
-void envoiTailleFenetre(th_ycbcr_buffer buffer) {}
+//Decodeur
+void envoiTailleFenetre(th_ycbcr_buffer buffer) {
+    pthread_mutex_lock(&mtxTaille);
+    windowsx = buffer[0].width;
+    windowsy = buffer[0].height;
+    changedTaille = true; //Used in the loop Because no Hoare signal
+    pthread_cond_signal(&condTaille);
+    pthread_mutex_unlock(&mtxTaille);
+}
 
-void attendreTailleFenetre() {}
+//Afficheur
+void attendreTailleFenetre() {
+    pthread_mutex_lock(&mtxTaille);
+    while (!changedTaille){
+        pthread_cond_wait(&condTaille, &mtxTaille);
+    }
+    changedTaille = false;
+    pthread_mutex_unlock(&mtxTaille);
+}
 
-void signalerFenetreEtTexturePrete() {}
+//Decodeur
+void signalerFenetreEtTexturePrete() {
+    pthread_mutex_lock(&mtxFenetre);
+    pthread_cond_signal(&condFenetre);
+    pthread_mutex_unlock(&mtxFenetre);
+}
 
-void attendreFenetreTexture() {}
+//Afficheur
+void attendreFenetreTexture() {
+    pthread_cond_wait(&condFenetre, &mtxFenetre);
+}
 
-void debutConsommerTexture() {}
+void debutConsommerTexture() {
+    pthread_mutex_lock(&mtxTexture);
+    while(emptyCases == NBTEX){
+        pthread_cond_wait(&condCons, &mtxTexture);
+    }
+    emptyCases++;
+    pthread_mutex_unlock(&mtxTexture);
+}
 
-void finConsommerTexture() {}
+void finConsommerTexture() {
+    pthread_mutex_lock(&mtxTexture);
+    pthread_cond_signal(&condProd);
+    pthread_mutex_unlock(&mtxTexture);
+}
 
-void debutDeposerTexture() {}
+void debutDeposerTexture() {
+    pthread_mutex_lock(&mtxTexture);
+    while(emptyCases == 0){
+        pthread_cond_wait(&condProd, &mtxTexture);
+    }
+    emptyCases--;
+    pthread_mutex_unlock(&mtxTexture);
 
-void finDeposerTexture() {}
+}
+
+void finDeposerTexture() {
+    pthread_mutex_lock(&mtxTexture);
+    pthread_cond_signal(&condCons);
+    pthread_mutex_unlock(&mtxTexture);
+}

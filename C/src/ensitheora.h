@@ -14,6 +14,7 @@ struct TextureDate {
 };
 
 extern struct streamstate *theorastrstate;
+extern int tex_iwri, tex_iaff;
 
 void *draw2SDL(void *arg);
 void theora2SDL(struct streamstate *s);

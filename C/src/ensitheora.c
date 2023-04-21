@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 int windowsx = 0;
 int windowsy = 0;
@@ -55,7 +56,9 @@ void *draw2SDL(void *arg) {
   // ADD Your code HERE
   /* Protéger l'accès à la hashmap */
 
+  pthread_mutex_lock(&theoraMtx);
   HASH_FIND_INT(theorastrstate, &serial, s);
+  pthread_mutex_unlock(&theoraMtx);
 
   // END of your modification HERE
 

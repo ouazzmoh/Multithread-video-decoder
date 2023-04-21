@@ -4,6 +4,14 @@
 #include "synchro.h"
 #include <assert.h>
 #include <time.h>
+#include <pthread.h>
+
+
+pthread_mutex_t theoraMtx;
+pthread_mutex_t vorbisMtx;
+pthread_cond_t mapCond;
+
+pthread_t theora2sdlthread;
 
 bool fini = false;
 
@@ -49,36 +57,45 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
   struct streamstate *s = NULL;
   if (bos) { // début de stream
-    s = malloc(sizeof(struct streamstate));
-    assert(s != NULL);
-    s->serial = serial;
-    s->nbpacket = 0;
-    s->nbpacketoutsync = 0;
-    s->strtype = TYPE_UNKNOW;
-    s->headersRead = false;
-    int res = ogg_stream_init(&s->strstate, serial);
-    th_info_init(&s->th_dec.info);
-    th_comment_init(&s->th_dec.comment);
-    vorbis_info_init(&s->vo_dec.info);
-    vorbis_comment_init(&s->vo_dec.comment);
-    assert(res == 0);
+      s = malloc(sizeof(struct streamstate));
+      assert(s != NULL);
+      s->serial = serial;
+      s->nbpacket = 0;
+      s->nbpacketoutsync = 0;
+      s->strtype = TYPE_UNKNOW;
+      s->headersRead = false;
+      int res = ogg_stream_init(&s->strstate, serial);
+      th_info_init(&s->th_dec.info);
+      th_comment_init(&s->th_dec.comment);
+      vorbis_info_init(&s->vo_dec.info);
+      vorbis_comment_init(&s->vo_dec.comment);
+      assert(res == 0);
 
-    // ADD Your code HERE
+      // ADD Your code HERE
+      // proteger l'accès à la hashmap
+
+      if (type == TYPE_THEORA) {
+          pthread_mutex_lock(&theoraMtx);
+          HASH_ADD_INT(theorastrstate, serial, s);
+          pthread_mutex_lock(&theoraMtx);
+      } else {
+          pthread_mutex_lock(&vorbisMtx);
+          HASH_ADD_INT(vorbisstrstate, serial, s);
+          pthread_mutex_unlock(&vorbisMtx);
+      }
+  }else {
     // proteger l'accès à la hashmap
 
-    if (type == TYPE_THEORA)
-      HASH_ADD_INT(theorastrstate, serial, s);
-    else
-      HASH_ADD_INT(vorbisstrstate, serial, s);
-
-  } else {
-    // proteger l'accès à la hashmap
-
-    if (type == TYPE_THEORA)
-      HASH_FIND_INT(theorastrstate, &serial, s);
-    else
-      HASH_FIND_INT(vorbisstrstate, &serial, s);
-
+    if (type == TYPE_THEORA) {
+        pthread_mutex_lock(&theoraMtx);
+        HASH_FIND_INT(theorastrstate, &serial, s);
+        pthread_mutex_lock(&theoraMtx);
+    }
+    else {
+        pthread_mutex_lock(&vorbisMtx);
+        HASH_FIND_INT(vorbisstrstate, &serial, s);
+        pthread_mutex_unlock(&vorbisMtx);
+    }
     // END of your code modification HERE
     assert(s != NULL);
   }
@@ -138,6 +155,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 	// BEGIN your modification HERE
         // lancement du thread gérant l'affichage (draw2SDL)
         // inserer votre code ici !!
+        pthread_create(&theora2sdlthread, NULL, draw2SDL, (void *)(long long int)(s->serial)); //We cast to long long int before to avoid data loss
         // END of your modification
         assert(res == 0);
       }

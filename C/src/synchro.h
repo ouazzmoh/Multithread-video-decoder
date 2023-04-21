@@ -3,10 +3,12 @@
 
 #include "ensitheora.h"
 #include <stdbool.h>
-
+/* Les extern des variables pour la synchro ici */
+extern pthread_mutex_t mtxTaille , mtxFenetre, mtxTexture;
+extern pthread_cond_t condTaille, condFenetre, condProd, condCons;
 extern bool fini;
 
-/* Les extern des variables pour la synchro ici */
+
 
 /* Fonctions de synchro à implanter */
 
