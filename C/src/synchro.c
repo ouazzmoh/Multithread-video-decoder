@@ -46,7 +46,7 @@ void attendreFenetreTexture() {
         pthread_cond_wait(&condFenetre, &mtxFenetre);
     }
     changedTexture = false;
-    pthread_mutex_lock(&mtxFenetre);
+    pthread_mutex_unlock(&mtxFenetre);
 }
 //---------------------------------
 void debutConsommerTexture() {
