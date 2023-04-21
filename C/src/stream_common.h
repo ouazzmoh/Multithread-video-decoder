@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 extern bool fini;
-extern pthread_mutex_t theoraMtx, vorbisMtx;
+extern pthread_mutex_t mapMtx;
 extern pthread_t theora2sdlthread;
 extern struct timespec datedebut;
 

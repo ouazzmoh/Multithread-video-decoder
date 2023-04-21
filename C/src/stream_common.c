@@ -7,8 +7,7 @@
 #include <pthread.h>
 
 
-pthread_mutex_t theoraMtx;
-pthread_mutex_t vorbisMtx;
+pthread_mutex_t mapMtx;
 pthread_cond_t mapCond;
 
 pthread_t theora2sdlthread;
@@ -73,29 +72,23 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
       // ADD Your code HERE
       // proteger l'accès à la hashmap
-
+      pthread_mutex_lock(&mapMtx);
       if (type == TYPE_THEORA) {
-          pthread_mutex_lock(&theoraMtx);
           HASH_ADD_INT(theorastrstate, serial, s);
-          pthread_mutex_lock(&theoraMtx);
       } else {
-          pthread_mutex_lock(&vorbisMtx);
           HASH_ADD_INT(vorbisstrstate, serial, s);
-          pthread_mutex_unlock(&vorbisMtx);
       }
+      pthread_mutex_unlock(&mapMtx);
   }else {
     // proteger l'accès à la hashmap
-
+    pthread_mutex_lock(&mapMtx);
     if (type == TYPE_THEORA) {
-        pthread_mutex_lock(&theoraMtx);
         HASH_FIND_INT(theorastrstate, &serial, s);
-        pthread_mutex_lock(&theoraMtx);
     }
     else {
-        pthread_mutex_lock(&vorbisMtx);
         HASH_FIND_INT(vorbisstrstate, &serial, s);
-        pthread_mutex_unlock(&vorbisMtx);
     }
+    pthread_mutex_unlock(&mapMtx);
     // END of your code modification HERE
     assert(s != NULL);
   }
@@ -150,7 +143,6 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
       assert(s->th_dec.ctx != NULL);
       assert(s->strtype == TYPE_THEORA);
       s->headersRead = true;
-
       if (type == TYPE_THEORA) {
 	// BEGIN your modification HERE
         // lancement du thread gérant l'affichage (draw2SDL)

@@ -12,8 +12,7 @@ pthread_t theorathread, vorbisthread;
 
 int main(int argc, char *argv[]) {
   int res;
-  pthread_mutex_init(&theoraMtx, NULL);
-  pthread_mutex_init(&vorbisMtx, NULL);
+  pthread_mutex_init(&mapMtx, NULL);
   pthread_mutex_init(&mtxTaille, NULL);
   pthread_mutex_init(&mtxFenetre, NULL);
   pthread_mutex_init(&mtxTexture, NULL);
@@ -36,12 +35,12 @@ int main(int argc, char *argv[]) {
   // Your code HERE
   // start the two stream readers (theoraStreamReader and vorbisStreamReader)
   pthread_create(&theorathread, NULL, theoraStreamReader, (void *)argv[1]);
-  pthread_join(theorathread, NULL);
-//  pthread_create(&vorbisthread, NULL, vorbisStreamReader, (void *)argv[1]);
+//  pthread_join(theorathread, NULL);
+  pthread_create(&vorbisthread, NULL, vorbisStreamReader, (void *)argv[1]);
   // each in a thread
 
   // wait for vorbis thread
-//  pthread_join(vorbisthread, NULL);
+  pthread_join(vorbisthread, NULL);
 
   // 1 seconde of sound in advance, thus wait 1 seconde
   // before leaving
@@ -53,8 +52,7 @@ int main(int argc, char *argv[]) {
 
   // TODO
   /* liberer des choses ? */
-  pthread_mutex_destroy(&theoraMtx);
-  pthread_mutex_destroy(&vorbisMtx);
+  pthread_mutex_destroy(&mapMtx);
   pthread_mutex_destroy(&mtxTaille);
   pthread_mutex_destroy(&mtxFenetre);
   pthread_mutex_destroy(&mtxTexture);

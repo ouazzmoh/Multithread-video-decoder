@@ -56,9 +56,9 @@ void *draw2SDL(void *arg) {
   // ADD Your code HERE
   /* Protéger l'accès à la hashmap */
 
-  pthread_mutex_lock(&theoraMtx);
+  pthread_mutex_lock(&mapMtx);
   HASH_FIND_INT(theorastrstate, &serial, s);
-  pthread_mutex_unlock(&theoraMtx);
+  pthread_mutex_unlock(&mapMtx);
 
   // END of your modification HERE
 

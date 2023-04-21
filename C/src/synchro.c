@@ -6,6 +6,7 @@
 pthread_mutex_t mtxTaille , mtxFenetre, mtxTexture;
 pthread_cond_t condTaille, condFenetre, condCons, condProd;
 bool changedTaille = false;
+bool changedTexture = false;
 
 int emptyCases = NBTEX;
 
@@ -29,30 +30,36 @@ void attendreTailleFenetre() {
     changedTaille = false;
     pthread_mutex_unlock(&mtxTaille);
 }
-
+//------------------------------
 //Decodeur
 void signalerFenetreEtTexturePrete() {
     pthread_mutex_lock(&mtxFenetre);
+    changedTexture = true;
     pthread_cond_signal(&condFenetre);
     pthread_mutex_unlock(&mtxFenetre);
 }
 
 //Afficheur
 void attendreFenetreTexture() {
-    pthread_cond_wait(&condFenetre, &mtxFenetre);
+    pthread_mutex_lock(&mtxFenetre);
+    while (!changedTexture) {
+        pthread_cond_wait(&condFenetre, &mtxFenetre);
+    }
+    changedTexture = false;
+    pthread_mutex_lock(&mtxFenetre);
 }
-
+//---------------------------------
 void debutConsommerTexture() {
     pthread_mutex_lock(&mtxTexture);
     while(emptyCases == NBTEX){
         pthread_cond_wait(&condCons, &mtxTexture);
     }
-    emptyCases++;
     pthread_mutex_unlock(&mtxTexture);
 }
 
 void finConsommerTexture() {
     pthread_mutex_lock(&mtxTexture);
+    emptyCases++;
     pthread_cond_signal(&condProd);
     pthread_mutex_unlock(&mtxTexture);
 }
@@ -62,13 +69,13 @@ void debutDeposerTexture() {
     while(emptyCases == 0){
         pthread_cond_wait(&condProd, &mtxTexture);
     }
-    emptyCases--;
     pthread_mutex_unlock(&mtxTexture);
 
 }
 
 void finDeposerTexture() {
     pthread_mutex_lock(&mtxTexture);
+    emptyCases--;
     pthread_cond_signal(&condCons);
     pthread_mutex_unlock(&mtxTexture);
 }
